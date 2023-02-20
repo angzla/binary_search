@@ -157,6 +157,28 @@ def argmin(f, lo, hi, epsilon=1e-3):
     >>> argmin(lambda x: (x-5)**2, -20, 0)
     -0.00016935087808430278
     '''
+    if hi - lo < epsilon:
+        return (lo + hi) / 2
+
+    # Select two points m1 and m2 that are between lo and hi
+    m1 = lo + (hi - lo) / 3
+    m2 = hi - (hi - lo) / 3
+
+    # Evaluate the function at the four points lo, m1, m2, hi
+    f_lo = f(lo)
+    f_m1 = f(m1)
+    f_m2 = f(m2)
+    f_hi = f(hi)
+
+    # Find the smallest of the four points
+    if f_m1 < f_m2:
+        return argmin(f, lo, m2, epsilon)
+    elif f_m2 < f_m1:
+        return argmin(f, m1, hi, epsilon)
+    elif f_lo < f_hi:
+        return argmin(f, lo, m1, epsilon)
+    else:
+        return argmin(f, m2, hi, epsilon)
 
 
 ################################################################################
@@ -179,6 +201,23 @@ def find_boundaries(f):
     else:
         you're done; return lo,hi
     '''
+    def search(lo, hi):
+        mid = (lo + hi) / 2
+        if f(lo) > f(mid):
+            if abs(lo) > max_bound:
+                return lo, hi
+            return search(lo * 2, hi)
+        elif f(hi) < f(mid):
+            if abs(hi) > max_bound:
+                return lo, hi
+            return search(lo, hi * 2)
+        else:
+            return lo, hi
+
+    # Start with initial values
+    lo, hi = -1, 1
+    max_bound = 10**10  # set a maximum boundary
+    return search(lo, hi)
 
 
 def argmin_simple(f, epsilon=1e-3):
