@@ -26,6 +26,21 @@ def find_smallest_positive(xs):
     >>> find_smallest_positive([-3, -2, -1]) is None
     True
     '''
+    def go(left, right):
+        if left > right:
+            return None
+
+        mid = (left + right) // 2
+
+        if xs[mid] > 0:
+            if mid == 0 or xs[mid-1] <= 0:
+                return mid
+            else:
+                return go(left, mid-1)
+        else:
+            return go(mid+1, right)
+
+    return go(0, len(xs)-1)
 
 
 def count_repeats(xs, x):
@@ -52,6 +67,62 @@ def count_repeats(xs, x):
     >>> count_repeats([3, 2, 1], 4)
     0
     '''
+    if x not in xs:
+        return 0
+    left = _lowest_index_greater_than(xs, x)
+    right = _lowest_index_less_than(xs, x)
+
+    if xs[-1] == x and xs[0] == x:
+        return (len(xs))
+
+    if xs[-1] != x and xs[0] != x:
+        return right - left - 1
+
+    return right - left
+
+
+
+def _lowest_index_less_than(xs, x):
+    '''
+    use binary search to find the lowest index in xs with a value < x
+    '''
+    def go(left, right):
+        if left > right:
+            return len(xs) - 1
+
+        mid = (left + right) // 2
+
+        if xs[mid] < x:
+            if xs[mid-1] == x:
+                return mid
+            else:
+                return go(left, mid - 1)
+        else:
+            return go(mid + 1, right)
+
+    return go(0, len(xs)-1)
+
+
+
+def _lowest_index_greater_than(xs, x):
+    '''
+    use binary search to find the lowest index in xs with a value >= x
+    '''
+    def go(left, right):
+        if left > right:
+            return 0
+
+        mid = (left + right) // 2
+
+        if xs[mid] > x:
+            if xs[mid+1] == x:
+                return mid
+            else:
+                return go(mid + 1, right)
+        else:
+            return go(left, mid - 1)
+
+    return go(0, len(xs)-1)
 
 
 def argmin(f, lo, hi, epsilon=1e-3):
